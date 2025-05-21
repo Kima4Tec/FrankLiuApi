@@ -1,6 +1,9 @@
-﻿using FrankLiuApi1.Models;
+﻿using FrankLiuApi1.Filters;
+using FrankLiuApi1.Models;
+using FrankLiuApi1.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 namespace FrankLiuApi1.Controllers
 {
@@ -8,6 +11,10 @@ namespace FrankLiuApi1.Controllers
     [Route("api/[Controller]")]
     public class ShirtsController : ControllerBase
     {
+        //Mock data
+
+
+
         /*-------------------------------------------------
                 Action Methods:
         [FromRoute] [FromRoute] string color
@@ -18,17 +25,40 @@ namespace FrankLiuApi1.Controllers
         ---------------------------------------------------*/
 
         [HttpGet] // the verb
-       //Unødvendig med template [Route("/shirts")] //attribute/url --> Denne controller/action skal reagere på anmodninger til URL-stien /shirts.
-        public string GetAllShirts()
+        public ActionResult<List<Shirt>> GetAllShirts()
         {
-            return "Reading all the shirts";
+            var shirts = ShirtRepository.GetShirts();
+            return Ok(shirts);
         }
+
         [HttpGet("{id}")]
-        //[Route("/shirts/{id}")]
-        public string GetShirtById(int id)
+        [Shirt_ValidateShirtIdFilter]
+        public ActionResult GetShirtById(int id)
         {
-            return $"Reading shirt with id: {id}";
+            //if (id < 1 || id > 4)
+            //{
+            //    return BadRequest($"The shirt with id {id} is not valid.");
+            //}
+            //if (!ShirtRepository.ShirtExists(id))
+            //{
+            //    return NotFound($"The shirt with id {id} was not found.");
+            //}
+            var shirt = ShirtRepository.GetShirtById(id);
+            return Ok(shirt);
         }
+
+        //[HttpGet("{color}")]
+        ////[Route("/shirts/{id}")]
+        //public ActionResult<List<Shirt>> GetShirtById(string color )
+        //{
+        //    var shirtList = shirts.Where(x => x.Color?.ToLower() == color).ToList();
+        //    if (shirtList.Count == 0)
+        //    {
+        //        return NotFound($"The color {color} is not available.");
+        //    }
+        //    return shirtList;
+        //    //return $"Reading shirt with id: {id}";
+        //}
         [HttpPost]
         //[Route("/shirts")]
         public IActionResult CreateShirt([FromBody] Shirt shirt)
